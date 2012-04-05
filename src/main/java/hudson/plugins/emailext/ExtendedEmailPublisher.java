@@ -2,6 +2,7 @@ package hudson.plugins.emailext;
 
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.matrix.MatrixAggregatable;
 import hudson.matrix.MatrixAggregator;
@@ -315,7 +316,7 @@ public class ExtendedEmailPublisher extends Notifier implements MatrixAggregatab
         AttachmentUtils attachments = new AttachmentUtils(attachmentsPattern);
         attachments.attach(multipart, build, listener);
         msg.setContent(multipart);        
-
+      
         EnvVars env = build.getEnvironment(listener);
 
         // Get the recipients from the global list of addresses
@@ -490,6 +491,18 @@ public class ExtendedEmailPublisher extends Notifier implements MatrixAggregatab
         // (plain text or HTML depending on the content type)
         MimeBodyPart msgPart = new MimeBodyPart();
         msgPart.setContent(text, messageContentType);
+        
+        try {
+            FilePath ws = build.getWorkspace();
+			ws.createTextTempFile("email.",".html",text);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  
         return msgPart;
     }   
 
